@@ -1,0 +1,1 @@
+to build all of docker images: mvn clean compile jib:build
