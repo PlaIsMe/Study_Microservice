@@ -71,10 +71,10 @@
                     </from>
                     <to>
                         <image>registry.hub.docker.com/phonglai0809/${project.artifactId}</image>
-						<auth>
+						<!-- <auth>
                             <username>phonglai0809</username>
                             <password>IamPhong89</password>
-                        </auth>
+                        </auth> -->
                     </to>
                 </configuration>
                 <!-- <executions>

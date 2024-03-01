@@ -32,3 +32,78 @@ services:
     container_name: zipkin
     ports:
       - "9411:9411"
+
+# ## Eureka Server
+#   discovery-server:
+#     image: ${DOCKER_USER}/discovery-server:latest
+#     container_name: discovery-server
+#     ports:
+#       - "8761:8761"
+#     environment:
+#       - SPRING_PROFILES_ACTIVE=docker
+#     depends_on:
+#       - zipkin
+
+#   api-gateway:
+#     image: ${DOCKER_USER}/api-gateway:latest
+#     container_name: api-gateway
+#     ports:
+#       - "8181:8080"
+#     expose:
+#       - "8181"
+#     environment:
+#       - SPRING_PROFILES_ACTIVE=docker
+#       - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY= TRACE
+#     depends_on:
+#       - zipkin
+#       - discovery-server
+#       - keycloak
+
+#   ## Product-Service Docker Compose Config
+#   product-service:
+#     container_name: product-service
+#     image: ${DOCKER_USER}/product-service:latest
+#     environment:
+#       - SPRING_PROFILES_ACTIVE=docker
+#     depends_on:
+#       - mongo
+#       - discovery-server
+#       - api-gateway
+
+#   ## Order-Service Docker Compose Config
+#   order-service:
+#     container_name: order-service
+#     image: ${DOCKER_USER}/order-service:latest
+#     environment:
+#       - SPRING_PROFILES_ACTIVE=docker
+#       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-order:5431/order-service
+#     depends_on:
+#       - postgres-order
+#       - broker
+#       - zipkin
+#       - discovery-server
+#       - api-gateway
+
+#   ## Inventory-Service Docker Compose Config
+#   inventory-service:
+#     container_name: inventory-service
+#     image: ${DOCKER_USER}/inventory-service:latest
+#     environment:
+#       - SPRING_PROFILES_ACTIVE=docker
+#       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-inventory:5432/inventory-service
+#     depends_on:
+#       - postgres-inventory
+#       - discovery-server
+#       - api-gateway
+
+#   ## Notification-Service Docker Compose Config
+#   notification-service:
+#     container_name: notification-service
+#     image: ${DOCKER_USER}/notification-service:latest
+#     environment:
+#       - SPRING_PROFILES_ACTIVE=docker
+#     depends_on:
+#       - zipkin
+#       - broker
+#       - discovery-server
+#       - api-gateway

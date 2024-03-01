@@ -12,8 +12,6 @@ import com.microservice.orderservice.event.OrderPlacedEvent;
 import com.microservice.orderservice.pojo.Orders;
 import com.microservice.orderservice.repository.OrderRepository;
 
-import io.micrometer.observation.Observation;
-import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.Tracer;
 import jakarta.transaction.Transactional;
@@ -25,19 +23,16 @@ import lombok.RequiredArgsConstructor;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final WebClient.Builder webClientBuilder;
-    private final ObservationRegistry observationRegistry;
+    private final Tracer tracer;
     private final ApplicationEventPublisher applicationEventPublisher;
     
     public String placeOrder(Orders order) {
         List<String> skuCodes = order.getOrderLineItems().stream().map(orderLineItem -> 
             orderLineItem.getSkuCode()).toList();
 
-        Observation inventoryServiceObservation = Observation.createNotStarted("inventory-service-lookup",
-                this.observationRegistry);
+        Span inventoryServiceLookup = tracer.nextSpan().name("inventory-service");
 
-        inventoryServiceObservation.lowCardinalityKeyValue("call", "inventory-service");
-
-        return inventoryServiceObservation.observe(() -> {
+        try (Tracer.SpanInScope spanInScope = tracer.withSpan(inventoryServiceLookup.start())) {
             InventoryResponse[] inventoryResponses = webClientBuilder.build().get()
                 .uri("http://inventory-service/api/inventory",
                 uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
@@ -56,6 +51,8 @@ public class OrderService {
             } else {
                 throw new IllegalArgumentException("Product is not in stock, please try again later");
             }
-        });
+        }  finally {
+            inventoryServiceLookup.end();
+        }
     }
 }
